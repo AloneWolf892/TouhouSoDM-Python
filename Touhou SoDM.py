@@ -108,8 +108,8 @@ def stage_builder(level_layout):
     global health_points
     global last_time
     player_stun: bool = False
-    health_points: int = 100
-    coin_score: int = 0
+    health_points = 100
+    coin_score = 0
     
     cooldown_tracker = 0
 
