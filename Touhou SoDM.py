@@ -1,10 +1,12 @@
 #Important libraries
-import pygame,random,os,time
+import pygame, random, os, time
 from pygame import Surface, mouse
 from pygame.locals import *
 from pygame import image as img
 from typing import List, Dict, Set, Optional, Any, Sequence, Callable
+import os, sys
 
+os.chdir(os.path.dirname(sys.argv[0]))
 
 pygame.init()
 pygame.mixer.init()
