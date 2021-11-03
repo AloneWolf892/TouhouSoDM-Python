@@ -1,5 +1,4 @@
 #Important libraries
-from numba.core.decorators import jit
 import pygame,random,os,time
 from pygame import Surface, mouse
 from pygame.locals import *
