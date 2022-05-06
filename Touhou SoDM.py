@@ -12,10 +12,10 @@ pygame.init()
 pygame.mixer.init()
 pygame.font.init()
 
-window_icon = img.load(".\Media\Images\Shinki-Icon.png")
-generic_background = img.load(".\Media\Images\\backg1.jpg")
+window_icon = img.load("./Media/Images/Shinki-Icon.png")
+generic_background = img.load("./Media/Images/backg1.jpg")
 
-generic_music: str = ".\Media\Music\Infinite Being.mp3"
+generic_music: str = "./Media/Music/Infinite Being.mp3"
 pygame.mixer.music.load(generic_music)
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(0.25)
@@ -41,7 +41,7 @@ game_rect = pygame.Rect(0,0,640,480)
 clock = pygame.time.Clock()
 
 #Inicializar partida guardada
-save_file = open(".\Saves\SaveFile.txt","r+")
+save_file = open("./Saves/SaveFile.txt","r+")
 level_1_state = level_2_state = level_3_state = False
 levels_state_list = [level_1_state,level_2_state,level_3_state]
 
@@ -54,55 +54,55 @@ mouse_position = mouse.get_pos()
 def stage_builder(level_layout):
     #Player and Enemy sprites
     player_walk_up_animation_sprites = [
-            img.load(".\Media\Images\RikakoSprites\Rikako-UP2.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-UP.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-UP3.png")
+            img.load("./Media/Images/RikakoSprites/Rikako-UP2.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-UP.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-UP3.png")
         ]
     
     player_walk_down_animation_sprites = [
-            img.load(".\Media\Images\RikakoSprites\Rikako-DOWN2.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-DOWN.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-DOWN3.png")
+            img.load("./Media/Images/RikakoSprites/Rikako-DOWN2.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-DOWN.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-DOWN3.png")
         ]
     
     player_walk_left_animation_sprites =  [
-            img.load(".\Media\Images\RikakoSprites\Rikako-LEFT2.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-LEFT.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-LEFT3.png")
+            img.load("./Media/Images/RikakoSprites/Rikako-LEFT2.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-LEFT.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-LEFT3.png")
         ]
     
     player_walk_right_animation_sprites = [
-            img.load(".\Media\Images\RikakoSprites\Rikako-RIGHT2.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-RIGHT.png"),
-            img.load(".\Media\Images\RikakoSprites\Rikako-RIGHT3.png")
+            img.load("./Media/Images/RikakoSprites/Rikako-RIGHT2.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-RIGHT.png"),
+            img.load("./Media/Images/RikakoSprites/Rikako-RIGHT3.png")
         ]
     
     enemy_turret_facing_sprites_type_A = [
-            img.load(".\Media\Images\PC-89 Sprites\PC98-sprites_47.png"),
-            img.load(".\Media\Images\PC-89 Sprites\PC98-sprites_11.png"),
-            img.load(".\Media\Images\PC-89 Sprites\PC98-sprites_23.png"),
-            img.load(".\Media\Images\PC-89 Sprites\PC98-sprites_35.png")
+            img.load("./Media/Images/PC-89 Sprites/PC98-sprites_47.png"),
+            img.load("./Media/Images/PC-89 Sprites/PC98-sprites_11.png"),
+            img.load("./Media/Images/PC-89 Sprites/PC98-sprites_23.png"),
+            img.load("./Media/Images/PC-89 Sprites/PC98-sprites_35.png")
         ]
 
     #World Sprites
-    terrain_sprite_type_A = img.load(".\Media\Images\ItemSprite\Items_02.png") #Grammita
-    wall_sprite_type_A = img.load(".\Media\Images\ItemSprite\Items_501.png") #
-    wall_sprite_type_B = img.load(".\Media\Images\ItemSprite\Items_527.png")
+    terrain_sprite_type_A = img.load("./Media/Images/ItemSprite/Items_02.png") #Grammita
+    wall_sprite_type_A = img.load("./Media/Images/ItemSprite/Items_501.png") #
+    wall_sprite_type_B = img.load("./Media/Images/ItemSprite/Items_527.png")
     door_sprite_type_A = [
-            img.load(".\Media\Images\ItemSprite\Items_360.png"),
-            img.load(".\Media\Images\ItemSprite\Items_368.png")
+            img.load("./Media/Images/ItemSprite/Items_360.png"),
+            img.load("./Media/Images/ItemSprite/Items_368.png")
         ]
-    coin_sprite_type_A = img.load(".\Media\Images\ItemSprite\Items_995.png")
-    accesory_sprite_type_A = img.load(".\Media\Images\ItemSprite\Items_1030.png")
+    coin_sprite_type_A = img.load("./Media/Images/ItemSprite/Items_995.png")
+    accesory_sprite_type_A = img.load("./Media/Images/ItemSprite/Items_1030.png")
 
     #Music and Sound effects
-    coin_get_sound = pygame.mixer.Sound(".\Media\Music\coinGet.ogg")
+    coin_get_sound = pygame.mixer.Sound("./Media/Music/coinGet.ogg")
     
-    player_shoots_sound = pygame.mixer.Sound(".\Media\Music\PlayerShoot.ogg") 
-    player_gets_shooted_sound = pygame.mixer.Sound(".\Media\Music\PlayerGetShoot.ogg")
-    player_dies_sound = pygame.mixer.Sound(".\Media\Music\Touhou Death Sound Pichuun.ogg")
-    enemy_dies_sound = pygame.mixer.Sound(".\Media\Music\EnemyDeath.ogg")
-    enemy_shoots_sound = pygame.mixer.Sound(".\Media\Music\EnemyShoot.ogg")
+    player_shoots_sound = pygame.mixer.Sound("./Media/Music/PlayerShoot.ogg") 
+    player_gets_shooted_sound = pygame.mixer.Sound("./Media/Music/PlayerGetShoot.ogg")
+    player_dies_sound = pygame.mixer.Sound("./Media/Music/Touhou Death Sound Pichuun.ogg")
+    enemy_dies_sound = pygame.mixer.Sound("./Media/Music/EnemyDeath.ogg")
+    enemy_shoots_sound = pygame.mixer.Sound("./Media/Music/EnemyShoot.ogg")
     
     #Some Variables being initialized
     
