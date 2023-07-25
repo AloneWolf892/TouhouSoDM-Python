@@ -1,9 +1,9 @@
 #Important libraries
-import pygame, random, os, time
-from pygame import Surface, mouse
-from pygame.locals import *
+import pygame, os, time
+from pygame import mouse
+import pygame.locals
+# from pygame.locals import *
 from pygame import image as img
-from typing import List, Dict, Set, Optional, Any, Sequence, Callable
 import os, sys
 
 os.chdir(os.path.dirname(sys.argv[0]))
@@ -109,7 +109,7 @@ def stage_builder(level_layout):
     global coin_score
     global health_points
     global last_time
-    player_stun: bool = False
+    # player_stun: bool = False
     health_points = 100
     coin_score = 0
     
@@ -277,7 +277,7 @@ def stage_builder(level_layout):
             game.blit(self.sprite,(self.rect.x,self.rect.y))
 
     #Game beggining
-    terrain_rect = pygame.Rect(32,32,576,416)
+    # terrain_rect = pygame.Rect(32,32,576,416)
     clock = pygame.time.Clock()
 
 
@@ -507,8 +507,8 @@ def stage_builder(level_layout):
             elif bullet_object.move_direction == "right":
                 bullet_object.rect.x += bullet_object.velocity
 
-        if not player_stun:
-            detected_key_pressing = pygame.key.get_pressed()
+        # if not player_stun:
+        detected_key_pressing = pygame.key.get_pressed()
 
         #Speed Up
         if detected_key_pressing[pygame.K_x]:
@@ -774,9 +774,9 @@ def redraw_game_window():
     )
     pygame.display.flip()
     
-Button(32,32,160,64,(0,0,0),(255,255,255),"Nivel 1 \:D/")
-Button(32,128,160,64,(0,0,0),(255,255,255),"Nivel 2 \:D/")
-Button(32,224,160,64,(0,0,0),(255,255,255),"Nivel 3 \:D/")
+Button(32,32,160,64,(0,0,0),(255,255,255),"Nivel 1 :D")
+Button(32,128,160,64,(0,0,0),(255,255,255),"Nivel 2 :D")
+Button(32,224,160,64,(0,0,0),(255,255,255),"Nivel 3 :D")
 Button(320,320,220,64,(0,0,0),(255,255,255),"Borrar Guardado")
 
 run = True
