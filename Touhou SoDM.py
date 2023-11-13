@@ -6,7 +6,7 @@ import pygame.locals
 from pygame import image as img
 import os, sys
 
-os.chdir(os.path.dirname(sys.argv[0]))
+os.path.dirname(os.path.abspath(__file__))
 
 pygame.init()
 pygame.mixer.init()
