@@ -5,12 +5,23 @@ import pygame.locals
 # from pygame.locals import *
 from pygame import image as img
 import os, sys
+from enum import Enum
 
 os.path.dirname(os.path.abspath(__file__))
 
 pygame.init()
 pygame.mixer.init()
 pygame.font.init()
+
+class SpriteIdentifier(Enum):
+    NONE = 0
+    TERRAIN = 1
+    WALL = 2
+    COIN = 3
+    DOOR = 4
+    ACCESORY = 5
+    TURRET = 6
+    BLANK = 7
 
 window_icon = img.load("./Media/Images/Shinki-Icon.png")
 generic_background = img.load("./Media/Images/backg1.jpg")
@@ -45,7 +56,6 @@ save_file = open("./Saves/SaveFile.txt","r+")
 level_1_state = level_2_state = level_3_state = False
 levels_state_list = [level_1_state,level_2_state,level_3_state]
 
-
 non_list_save_file_default = ""
 default_save_file = ["Level_1 = Fals\n","Level_2 = Fals\n","Level_3 = Fals\n"]
 complete_save_file = ["Level_1 = True\n","Level_2 = True\n","Level_3 = True\n"]
@@ -58,25 +68,25 @@ def stage_builder(level_layout):
             img.load("./Media/Images/RikakoSprites/Rikako-UP.png"),
             img.load("./Media/Images/RikakoSprites/Rikako-UP3.png")
         ]
-    
+
     player_walk_down_animation_sprites = [
             img.load("./Media/Images/RikakoSprites/Rikako-DOWN2.png"),
             img.load("./Media/Images/RikakoSprites/Rikako-DOWN.png"),
             img.load("./Media/Images/RikakoSprites/Rikako-DOWN3.png")
         ]
-    
+
     player_walk_left_animation_sprites =  [
             img.load("./Media/Images/RikakoSprites/Rikako-LEFT2.png"),
             img.load("./Media/Images/RikakoSprites/Rikako-LEFT.png"),
             img.load("./Media/Images/RikakoSprites/Rikako-LEFT3.png")
         ]
-    
+
     player_walk_right_animation_sprites = [
             img.load("./Media/Images/RikakoSprites/Rikako-RIGHT2.png"),
             img.load("./Media/Images/RikakoSprites/Rikako-RIGHT.png"),
             img.load("./Media/Images/RikakoSprites/Rikako-RIGHT3.png")
         ]
-    
+
     enemy_turret_facing_sprites_type_A = [
             img.load("./Media/Images/PC-89 Sprites/PC98-sprites_47.png"),
             img.load("./Media/Images/PC-89 Sprites/PC98-sprites_11.png"),
@@ -97,22 +107,22 @@ def stage_builder(level_layout):
 
     #Music and Sound effects
     coin_get_sound = pygame.mixer.Sound("./Media/Music/coinGet.ogg")
-    
-    player_shoots_sound = pygame.mixer.Sound("./Media/Music/PlayerShoot.ogg") 
+
+    player_shoots_sound = pygame.mixer.Sound("./Media/Music/PlayerShoot.ogg")
     player_gets_shooted_sound = pygame.mixer.Sound("./Media/Music/PlayerGetShoot.ogg")
     player_dies_sound = pygame.mixer.Sound("./Media/Music/Touhou Death Sound Pichuun.ogg")
     enemy_dies_sound = pygame.mixer.Sound("./Media/Music/EnemyDeath.ogg")
     enemy_shoots_sound = pygame.mixer.Sound("./Media/Music/EnemyShoot.ogg")
-    
+
     #Some Variables being initialized
-    
+
     global coin_score
     global health_points
     global last_time
     # player_stun: bool = False
     health_points = 100
     coin_score = 0
-    
+
     cooldown_tracker = 0
 
     class Player(object):
@@ -123,14 +133,14 @@ def stage_builder(level_layout):
             self.standing_state = True
             self.facing = "down"
             self.velocity = 4
-        
+
         #Detect key pressing for movement
         def move_detector(self,difference_in_x,difference_in_y):
             if difference_in_x != 0:
                 self.move_in_axis(difference_in_x,0)
             if difference_in_y != 0:
                 self.move_in_axis(0,difference_in_y)
-        
+
         #Make the player move and detect collides
         def move_in_axis(self,difference_in_x,difference_in_y):
             self.rect.x += difference_in_x
@@ -164,30 +174,32 @@ def stage_builder(level_layout):
         def draw(self,game):
             if self.walk_animation_count >= 3:
                 self.walk_animation_count = 0
-            
+
             if self.standing_state == True:
-                if self.facing == "up":
-                    game.blit(player_walk_up_animation_sprites[1],(self.rect.x,self.rect.y))
-                if self.facing == "down":
-                    game.blit(player_walk_down_animation_sprites[1],(self.rect.x,self.rect.y))
-                if self.facing == "left":
-                    game.blit(player_walk_left_animation_sprites[1],(self.rect.x,self.rect.y))
-                if self.facing == "right":
-                    game.blit(player_walk_right_animation_sprites[1],(self.rect.x,self.rect.y))
-                
+                match self.facing:
+                    case "up":
+                        game.blit(player_walk_up_animation_sprites[1],(self.rect.x,self.rect.y))
+                    case "down":
+                        game.blit(player_walk_down_animation_sprites[1],(self.rect.x,self.rect.y))
+                    case "left":
+                        game.blit(player_walk_left_animation_sprites[1],(self.rect.x,self.rect.y))
+                    case "right":
+                        game.blit(player_walk_right_animation_sprites[1],(self.rect.x,self.rect.y))
+
             else:
-                if self.facing == "up":
-                    game.blit(player_walk_up_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
-                    self.walk_animation_count += 1
-                if self.facing == "down":
-                    game.blit(player_walk_down_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
-                    self.walk_animation_count += 1
-                if self.facing == "left":
-                    game.blit(player_walk_left_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
-                    self.walk_animation_count += 1
-                if self.facing == "right":
-                    game.blit(player_walk_right_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
-                    self.walk_animation_count += 1
+                match self.facing:
+                    case "up":
+                        game.blit(player_walk_up_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
+                        self.walk_animation_count += 1
+                    case "down":
+                        game.blit(player_walk_down_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
+                        self.walk_animation_count += 1
+                    case "left":
+                        game.blit(player_walk_left_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
+                        self.walk_animation_count += 1
+                    case "right":
+                        game.blit(player_walk_right_animation_sprites[self.walk_animation_count],(self.rect.x,self.rect.y))
+                        self.walk_animation_count += 1
 
     class Wall(object):
         #Initiate and creating the walls list
@@ -195,7 +207,7 @@ def stage_builder(level_layout):
             self.rect = pygame.Rect(display_coordinates[0],display_coordinates[1],28,28)
             self.sprite = object_sprite
             wall_list.append(self)
-        
+
         def object_draw(self,game):
             game.blit(self.sprite,(self.rect.x,self.rect.y))
 
@@ -204,7 +216,7 @@ def stage_builder(level_layout):
             self.rect = pygame.Rect(display_coordinates[0],display_coordinates[1],28,28)
             self.sprite = object_sprite
             terrain_list.append(self)
-        
+
         def object_draw(self,game):
             game.blit(self.sprite,(self.rect.x,self.rect.y))
 
@@ -214,7 +226,7 @@ def stage_builder(level_layout):
             self.rect = pygame.Rect(display_coordinates[0],display_coordinates[1],28,28)
             self.sprite = object_sprite
             coin_list.append(self)
-        
+
         def object_draw(self,game):
             game.blit(self.sprite,(self.rect.x,self.rect.y))
 
@@ -225,13 +237,14 @@ def stage_builder(level_layout):
             self.move_direction = shooter_facing_state
             self.bullet_radius = 5
             self.rect = pygame.Rect(display_coordinates[0],display_coordinates[1],5,5)
-            
-            if(shooters_identity == "Rikako"):
-                self.bullet_color = (255,0,255)
-                bullets_shot_by_player.append(self)
-            if(shooters_identity == "Fairy"):
-                self.bullet_color = (0,255,0)
-                bullets_shot_by_enemy_turret.append(self)
+
+            match shooters_identity:
+                case "Rikako":
+                    self.bullet_color = (255,0,255)
+                    bullets_shot_by_player.append(self)
+                case "Fairy":
+                    self.bullet_color = (0,255,0)
+                    bullets_shot_by_enemy_turret.append(self)
 
         #Display the bullets
         def bullet_shots(self,game):
@@ -244,26 +257,24 @@ def stage_builder(level_layout):
             self.facing_state = facing_state
             self.sprite = object_sprites
             enemy_turret_list.append(self)
-        
+
         def object_draw(self,game):
-            if self.facing_state == "up":
-                game.blit(self.sprite[0],(self.rect.x,self.rect.y))
-            
-            if self.facing_state == "down":
-                game.blit(self.sprite[1],(self.rect.x,self.rect.y))
-            
-            if self.facing_state == "left":
-                game.blit(self.sprite[2],(self.rect.x,self.rect.y))
-            
-            if self.facing_state == "right":
-                game.blit(self.sprite[3],(self.rect.x,self.rect.y))
+            match self.facing_state:
+                case "up":
+                    game.blit(self.sprite[0],(self.rect.x,self.rect.y))
+                case "down":
+                    game.blit(self.sprite[1],(self.rect.x,self.rect.y))
+                case "left":
+                    game.blit(self.sprite[2],(self.rect.x,self.rect.y))
+                case "right":
+                    game.blit(self.sprite[3],(self.rect.x,self.rect.y))
 
     class Door(object):
         def __init__(self,display_coordinates,object_sprite):
             self.rect = pygame.Rect(display_coordinates[0],display_coordinates[1],28,28)
             self.sprite = object_sprite
             door_list.append(self)
-        
+
         def object_draw(self,game):
             game.blit(self.sprite,(self.rect.x,self.rect.y))
 
@@ -272,7 +283,7 @@ def stage_builder(level_layout):
             self.rect = pygame.Rect(display_coordinates[0],display_coordinates[1],28,28)
             self.sprite = object_sprite
             accesory_list.append(self)
-        
+
         def object_draw(self,game):
             game.blit(self.sprite,(self.rect.x,self.rect.y))
 
@@ -295,95 +306,81 @@ def stage_builder(level_layout):
     #Level Layout, P = Player, W = Walls, E = Enemy/Turret, C = Coins
 
     #Read the Layout and create the elements
-    
+
     def level_layout_read(level_layout):
 
-        wall_identifier = False
-        coin_identifier = False
-        terrain_identifier = False
-        door_identifier = False
-        accesory_identifier = False
-        enemy_turret_identifier = False
-        blank_identifier = False
+        identifier = SpriteIdentifier.NONE
 
         x_display_coordinates = y_display_coordinates = 0
         for row in level_layout:
             for column in row:
                 if x_display_coordinates >= 32 and y_display_coordinates >= 32 and y_display_coordinates < 448 and x_display_coordinates < 640:
-                    if column == "-":
-                        terrain_identifier = True
-                    elif terrain_identifier:
-                        if column == ".":
-                            Terrain((x_display_coordinates - 32,y_display_coordinates),terrain_sprite_type_A)
-                            terrain_identifier = False
+                    match column:
+                        case "-":
+                            identifier = SpriteIdentifier.TERRAIN
+                        case "W":
+                            identifier = SpriteIdentifier.WALL
+                        case "C":
+                            identifier = SpriteIdentifier.COIN
+                        case "D":
+                            identifier = SpriteIdentifier.DOOR
+                        case "A":
+                            identifier = SpriteIdentifier.ACCESORY
+                        case "T":
+                            identifier = SpriteIdentifier.TURRET
+                        case "~":
+                            identifier = SpriteIdentifier.BLANK
+                        case ".":
+                            match identifier:
+                                case SpriteIdentifier.TERRAIN:
+                                    Terrain((x_display_coordinates - 32,y_display_coordinates),terrain_sprite_type_A)
+                                    identifier = SpriteIdentifier.NONE
+                                case SpriteIdentifier.BLANK:
+                                    identifier = SpriteIdentifier.NONE
+                        case "a":
+                            match identifier:
+                                case SpriteIdentifier.WALL:
+                                    Wall((x_display_coordinates - 32,y_display_coordinates),wall_sprite_type_A)
+                                    identifier = SpriteIdentifier.NONE
+                                case SpriteIdentifier.COIN:
+                                    Coin((x_display_coordinates - 32,y_display_coordinates),coin_sprite_type_A)
+                                    identifier = SpriteIdentifier.NONE
+                                case SpriteIdentifier.DOOR:
+                                    Door((x_display_coordinates - 32,y_display_coordinates),door_sprite_type_A[0])
+                                    identifier = SpriteIdentifier.NONE
+                                case SpriteIdentifier.ACCESORY:
+                                    Accesory((x_display_coordinates - 32,y_display_coordinates),accesory_sprite_type_A)
+                                    identifier = SpriteIdentifier.NONE
+                        case "b":
+                            match identifier:
+                                case SpriteIdentifier.WALL:
+                                    Wall((x_display_coordinates - 32,y_display_coordinates),wall_sprite_type_B)
+                                    identifier = SpriteIdentifier.NONE
+                                case SpriteIdentifier.DOOR:
+                                    Door((x_display_coordinates - 32,y_display_coordinates),door_sprite_type_A[1])
+                                    identifier = SpriteIdentifier.NONE
+                        case "u":
+                            match identifier:
+                                case SpriteIdentifier.TURRET:
+                                    Turret((x_display_coordinates - 32,y_display_coordinates),"up",enemy_turret_facing_sprites_type_A)
+                                    identifier = SpriteIdentifier.NONE
+                        case "d":
+                            match identifier:
+                                case SpriteIdentifier.TURRET:
+                                    Turret((x_display_coordinates - 32,y_display_coordinates),"down",enemy_turret_facing_sprites_type_A)
+                                    identifier = SpriteIdentifier.NONE
+                        case "l":
+                            match identifier:
+                                case SpriteIdentifier.TURRET:
+                                    Turret((x_display_coordinates - 32,y_display_coordinates),"left",enemy_turret_facing_sprites_type_A)
+                                    identifier = SpriteIdentifier.NONE
+                        case "r":
+                            match identifier:
+                                case SpriteIdentifier.TURRET:
+                                    Turret((x_display_coordinates - 32,y_display_coordinates),"right",enemy_turret_facing_sprites_type_A)
+                                    identifier = SpriteIdentifier.NONE
 
-                    elif column == "W":
-                        wall_identifier = True
-                    elif wall_identifier:
-                        if column == "a":
-                            Wall((x_display_coordinates - 32,y_display_coordinates),wall_sprite_type_A)
-                            wall_identifier = False
-                        elif column == "b":
-                            Wall((x_display_coordinates - 32,y_display_coordinates),wall_sprite_type_B)
-                            wall_identifier = False
-
-                    elif column == "C":
-                        coin_identifier = True
-                    elif coin_identifier:
-                        if column == "a":
-                            Coin((x_display_coordinates - 32,y_display_coordinates),coin_sprite_type_A)
-                            coin_identifier = False
-                    
-                    elif column == "D":
-                        door_identifier = True
-                    elif door_identifier:
-                        if column == "a":
-                            Door((x_display_coordinates - 32,y_display_coordinates),door_sprite_type_A[0])
-                            door_identifier = False
-                        elif column == "b":
-                            Door((x_display_coordinates - 32,y_display_coordinates),door_sprite_type_A[1])
-                            door_identifier = False
-                    
-                    elif column == "A":
-                        accesory_identifier = True
-                    elif accesory_identifier:
-                        if column == "a":
-                            Accesory((x_display_coordinates - 32,y_display_coordinates),accesory_sprite_type_A)
-                            accesory_identifier = False
-
-                    elif column == "T":
-                        enemy_turret_identifier = True
-                    elif enemy_turret_identifier:
-                        if column == "u":
-                            Turret((x_display_coordinates - 32,y_display_coordinates),"up",enemy_turret_facing_sprites_type_A)
-                            enemy_turret_identifier = False
-                        elif column == "d":
-                            Turret((x_display_coordinates - 32,y_display_coordinates),"down",enemy_turret_facing_sprites_type_A)
-                            enemy_turret_identifier = False
-                        elif column == "l":
-                            Turret((x_display_coordinates - 32,y_display_coordinates),"left",enemy_turret_facing_sprites_type_A)
-                            enemy_turret_identifier = False
-                        elif column == "r":
-                            Turret((x_display_coordinates - 32,y_display_coordinates),"right",enemy_turret_facing_sprites_type_A)
-                            enemy_turret_identifier = False
-                        
-                    elif column == "~":
-                        blank_identifier = True
-                    elif blank_identifier:
-                        if column == ".":
-                            blank_identifier = False
-
-                layout_identifiers_list = [
-                        wall_identifier,
-                        coin_identifier,
-                        terrain_identifier,
-                        door_identifier,
-                        accesory_identifier,
-                        enemy_turret_identifier,
-                        blank_identifier
-                    ]
-                
-                if not any(layout_identifiers_list):
+                if identifier == SpriteIdentifier.NONE:
                     x_display_coordinates +=32
 
             y_display_coordinates += 32
@@ -392,7 +389,7 @@ def stage_builder(level_layout):
     level_layout_read(level_layout[0])
     level_layout_read(level_layout[1])
 
-    #Time checking for enemy 
+    #Time checking for enemy
     def check_time_passed():
         enemy_shoots_sound.set_volume(0.3)
         actual_time = time.time()
@@ -400,62 +397,62 @@ def stage_builder(level_layout):
         time_has_passed = actual_time > last_time + 1
         if time_has_passed:
             for enemy_turret_object in enemy_turret_list:
-                Bullet((enemy_turret_object.rect.x + enemy_turret_object.rect.width//2,enemy_turret_object.rect.y + enemy_turret_object.rect.height//2),enemy_turret_object.facing_state,"Fairy")  
+                Bullet((enemy_turret_object.rect.x + enemy_turret_object.rect.width//2,enemy_turret_object.rect.y + enemy_turret_object.rect.height//2),enemy_turret_object.facing_state,"Fairy")
             enemy_shoots_sound.play()
             last_time = time.time()
 
     #Display
     def redraw_game_window():
         game.blit(generic_background,(0,0))
-        
+
         check_time_passed()
-        
+
         for terrain_object in terrain_list:
             terrain_object.object_draw(game)
-        
+
         for wall_object in wall_list:
             wall_object.object_draw(game)
-        
+
         for door_object in door_list:
             door_object.object_draw(game)
-        
+
         for coin_object in coin_list:
             coin_object.object_draw(game)
-        
+
         for accesory_object in accesory_list:
             accesory_object.object_draw(game)
-        
+
         for enemy_turret_object in enemy_turret_list:
             enemy_turret_object.object_draw(game)
-        
+
         for bullet_object in bullets_shot_by_player:
             bullet_object.bullet_shots(game)
-        
+
         for bullet_object in bullets_shot_by_enemy_turret:
             bullet_object.bullet_shots(game)
-        
+
         rikako.draw(game)
-        
+
         coin_score_string = str(coin_score)
         health_points_string = str(health_points)
-        
+
         coin_score_display_text = comic_sans_font_28.render("Coins:" + coin_score_string, True, (0,0,0))
         health_points_display_text = comic_sans_font_28.render("Health: " + health_points_string,True, (0,0,0))
         lost_display_text_1 = comic_sans_font_56.render("PERDISTE D:",True,(0,0,0))
         win_display_text_1 = comic_sans_font_56.render("GANASTE :D",True,(0,0,0))
-        
+
         game.blit(coin_score_display_text,(320,-5))
         game.blit(health_points_display_text,(32,-5))
-        
+
         if len(enemy_turret_list) == 0 and len(coin_list) == 0:
             game.blit(win_display_text_1,(160,160))
-        
+
         if health_points <= 0:
             player_dies_sound.play()
             game.blit(lost_display_text_1,(160,160))
-        
+
         pygame.display.flip()
-        
+
 
     #Main Loop
     run = True
@@ -467,45 +464,48 @@ def stage_builder(level_layout):
             if e.type == pygame.QUIT:
                 run = False
                 pygame.quit()
-        
+
         #Bullet movement and colliding
         for bullet_object in bullets_shot_by_player:
             for wall_object in wall_list:
                 if bullet_object.rect.colliderect(wall_object.rect):
                     bullets_shot_by_player.pop(bullets_shot_by_player.index(bullet_object))
-            
+
             for enemy_turret_object in enemy_turret_list:
                 if bullet_object.rect.colliderect(enemy_turret_object.rect):
                     enemy_dies_sound.play()
                     bullets_shot_by_player.pop(bullets_shot_by_player.index(bullet_object))
                     enemy_turret_list.pop(enemy_turret_list.index(enemy_turret_object))
-            
-            if bullet_object.move_direction == "up":
-                bullet_object.rect.y -= bullet_object.velocity
-            elif bullet_object.move_direction == "down":
-                bullet_object.rect.y += bullet_object.velocity
-            elif bullet_object.move_direction == "left":
-                bullet_object.rect.x -= bullet_object.velocity
-            elif bullet_object.move_direction == "right":
-                bullet_object.rect.x += bullet_object.velocity
+
+            match bullet_object.move_direction:
+                case "up":
+                    bullet_object.rect.y -= bullet_object.velocity
+                case "down":
+                    bullet_object.rect.y += bullet_object.velocity
+                case "left":
+                    bullet_object.rect.x -= bullet_object.velocity
+                case "right":
+                    bullet_object.rect.x += bullet_object.velocity
+
         for bullet_object in bullets_shot_by_enemy_turret:
             for wall_object in wall_list:
                 if bullet_object.rect.colliderect(wall_object.rect):
                     bullets_shot_by_enemy_turret.pop(bullets_shot_by_enemy_turret.index(bullet_object))
-            
+
             if bullet_object.rect.colliderect(rikako.rect):
                 player_gets_shooted_sound.play()
                 health_points -= 25
                 bullets_shot_by_enemy_turret.pop(bullets_shot_by_enemy_turret.index(bullet_object))
 
-            if bullet_object.move_direction == "up":
-                bullet_object.rect.y -= bullet_object.velocity
-            elif bullet_object.move_direction == "down":
-                bullet_object.rect.y += bullet_object.velocity
-            elif bullet_object.move_direction == "left":
-                bullet_object.rect.x -= bullet_object.velocity
-            elif bullet_object.move_direction == "right":
-                bullet_object.rect.x += bullet_object.velocity
+            match bullet_object.move_direction:
+                case "up":
+                    bullet_object.rect.y -= bullet_object.velocity
+                case "down":
+                    bullet_object.rect.y += bullet_object.velocity
+                case "left":
+                    bullet_object.rect.x -= bullet_object.velocity
+                case "right":
+                    bullet_object.rect.x += bullet_object.velocity
 
         # if not player_stun:
         detected_key_pressing = pygame.key.get_pressed()
@@ -515,17 +515,17 @@ def stage_builder(level_layout):
             rikako.velocity = 8
         else:
             rikako.velocity = 4
-        
+
         #Shooting
         cooldown_tracker += clock.get_time()
-        if detected_key_pressing[pygame.K_z]: 
+        if detected_key_pressing[pygame.K_z]:
             player_shoots_sound.set_volume(1)
             if cooldown_tracker > 170:
                 cooldown_tracker = 0
                 if len(bullets_shot_by_player) <= 10:
                     Bullet((rikako.rect.x + rikako.rect.width//2,rikako.rect.y + rikako.rect.height//2),rikako.facing,"Rikako")
                     player_shoots_sound.play()
-        
+
         #Movement keys
         if detected_key_pressing[pygame.K_UP]:
             rikako.move_detector(0,rikako.velocity * -1)
@@ -549,7 +549,7 @@ def stage_builder(level_layout):
 
         else:
             rikako.standing_state = True
-        
+
         #Keep player inside the screen
         rikako.rect.clamp_ip(game_rect)
 
@@ -560,12 +560,12 @@ def stage_builder(level_layout):
             time.sleep(2)
             run = False
             return True
-        
+
         elif health_points <= 0:
             time.sleep(2)
             run = False
             return False
-    
+
 #Wa = Pared de tipo A
 #Du = Puerta de tipo A parte de arriba
 #Ca = Moneda de tipo A
@@ -649,7 +649,7 @@ level_1_front_layout = [
         "~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.", #E
         "~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~.~."  #F
     ]
-level_1_layout = [ 
+level_1_layout = [
         level_1_back_layout,
         level_1_front_layout
     ]
@@ -749,14 +749,14 @@ class Button(object):
         self.color2 = color2
         self.text = text
         buttons_list.append(self)
-    
+
     def draw(self,game,mousePos,comic_sans_font_28):
         if self.rect.x < mousePos[0] and self.rect.y < mousePos[1] and self.rect.right > mousePos[0] and self.rect.bottom > mousePos[1]:
             self.show = comic_sans_font_28.render(self.text,True,self.color2)
             game.fill(self.color1,self.rect)
             game.blit(self.show,self.rect)
         else:
-            self.show = comic_sans_font_28.render(self.text,True,self.color1) 
+            self.show = comic_sans_font_28.render(self.text,True,self.color1)
             game.fill(self.color2,self.rect)
             game.blit(self.show,self.rect)
 
@@ -773,7 +773,7 @@ def redraw_game_window():
         button.draw(game,mouse_position,comic_sans_font_28
     )
     pygame.display.flip()
-    
+
 Button(32,32,160,64,(0,0,0),(255,255,255),"Nivel 1 :D")
 Button(32,128,160,64,(0,0,0),(255,255,255),"Nivel 2 :D")
 Button(32,224,160,64,(0,0,0),(255,255,255),"Nivel 3 :D")
@@ -787,7 +787,7 @@ while run:
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             run = False
-    
+
     save_file.seek(0)
     save_state = save_file.readlines()
 
@@ -810,9 +810,9 @@ while run:
                     if save_state[buttons_list_index - 1] == complete_save_file[buttons_list_index - 1]:
                         levels_state_list[buttons_list_index] = stage_builder(levels_list[buttons_list_index])
                         time.sleep(0.1)
-                
+
     mouse_position = mouse.get_pos()
-    
+
     for levels_state_list_index, x in enumerate(levels_state_list):
         if levels_state_list[levels_state_list_index] == True:
             if save_state[levels_state_list_index] == default_save_file[levels_state_list_index]:
@@ -821,7 +821,7 @@ while run:
                 save_file.seek(0,2)
                 save_file.truncate()
                 levels_state_list[levels_state_list_index] = False
-    
+
     check_time_passed()
     redraw_game_window()
 
